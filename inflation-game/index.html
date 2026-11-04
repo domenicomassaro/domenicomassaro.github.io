@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Forecasting Office</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF1EF;
+  --surface:#FFFFFF;
+  --surface-2:#E4E9E6;
+  --ink:#16262A;
+  --ink-soft:#556267;
+  --line:#D3DBD7;
+  --accent:#B9812C;      /* forecast / gold */
+  --accent-ink:#7A5217;
+  --teal:#1F6F66;        /* realized */
+  --teal-ink:#123F39;
+  --rose:#AE3A50;        /* positive surprise */
+  --rose-ink:#7A2438;
+  --shadow: 0 1px 2px rgba(20,30,30,.06), 0 8px 24px -12px rgba(20,30,30,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1718;
+    --surface:#182325;
+    --surface-2:#1F2C2E;
+    --ink:#E7EEEC;
+    --ink-soft:#9BACAC;
+    --line:#2B3A3C;
+    --accent:#DBA646;
+    --accent-ink:#F3D9A0;
+    --teal:#4CB0A3;
+    --teal-ink:#A9E4DA;
+    --rose:#E1808F;
+    --rose-ink:#F6C3CC;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 30px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1718;
+  --surface:#182325;
+  --surface-2:#1F2C2E;
+  --ink:#E7EEEC;
+  --ink-soft:#9BACAC;
+  --line:#2B3A3C;
+  --accent:#DBA646;
+  --accent-ink:#F3D9A0;
+  --teal:#4CB0A3;
+  --teal-ink:#A9E4DA;
+  --rose:#E1808F;
+  --rose-ink:#F6C3CC;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 30px -14px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Work Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  padding:32px 16px 56px;
+  min-height:100vh;
+}
+.wrap{max-width:920px;margin:0 auto;}
+h1,h2,h3{font-family:"Fraunces",Georgia,serif;font-weight:700;line-height:1.15;text-wrap:balance;margin:0;}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace;
+  font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-soft);margin:0 0 10px;
+}
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+}
+a{color:var(--teal);}
+
+/* ---- intro screen ---- */
+.memo{
+  padding:38px clamp(20px,5vw,52px) 42px;
+  position:relative;
+  overflow:hidden;
+}
+.memo::before{
+  content:"";position:absolute;inset:0 0 auto 0;height:6px;
+  background:linear-gradient(90deg,var(--teal),var(--accent));
+}
+.memo-head{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:24px;flex-wrap:wrap;
+}
+.memo-head h1{font-size:clamp(26px,4vw,34px);}
+.badge{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:96px;height:96px;border-radius:50%;
+  border:2px solid var(--teal);color:var(--teal-ink);
+  font-family:"IBM Plex Mono",monospace;text-align:center;flex:0 0 auto;
+  transform:rotate(-6deg);
+}
+.badge .n{font-size:22px;font-weight:600;line-height:1;color:var(--teal);}
+.badge .l{font-size:9px;letter-spacing:.06em;text-transform:uppercase;margin-top:2px;}
+.memo p{font-size:16px;line-height:1.6;color:var(--ink);margin:0 0 14px;max-width:64ch;}
+.memo p.soft{color:var(--ink-soft);}
+ol.steps{margin:18px 0 26px;padding:0;list-style:none;display:grid;gap:12px;}
+ol.steps li{
+  display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:baseline;
+  font-size:15px;line-height:1.5;
+}
+ol.steps li .num{
+  font-family:"IBM Plex Mono",monospace;color:var(--accent-ink);background:var(--surface-2);
+  border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;
+}
+.form-row{
+  display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px;
+  border-top:1px dashed var(--line);padding-top:22px;
+}
+label.field-label{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;
+}
+input[type="text"],input[type="number"]{
+  font-family:"IBM Plex Mono",monospace;font-size:16px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line);border-radius:8px;
+  padding:11px 13px;width:100%;
+}
+input[type="text"]:focus,input[type="number"]:focus{outline:2px solid var(--teal);outline-offset:1px;}
+.btn{
+  font-family:"Work Sans",sans-serif;font-weight:600;font-size:15px;
+  border:none;border-radius:9px;padding:13px 22px;cursor:pointer;
+  background:var(--teal);color:#F4FBF9;transition:transform .12s ease, box-shadow .12s ease;
+  white-space:nowrap;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px -8px rgba(20,80,70,.5);}
+.btn:active{transform:translateY(0);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn.secondary{background:transparent;color:var(--ink-soft);border:1px solid var(--line);}
+.btn.gold{background:var(--accent);color:#2A1C05;}
+.field-wrap{flex:1 1 220px;}
+.link-reset{
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-soft);
+  background:none;border:none;text-decoration:underline;cursor:pointer;padding:0;
+}
+
+/* ---- game screen ---- */
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+.who{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-soft);}
+.who b{color:var(--ink);}
+.timeline{display:flex;gap:4px;flex-wrap:wrap;}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);}
+.dot.done{background:var(--teal);border-color:var(--teal);}
+.dot.now{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);}
+
+.game-grid{display:grid;grid-template-columns:280px 1fr;gap:18px;}
+@media (max-width:760px){.game-grid{grid-template-columns:1fr;}}
+
+.panel{padding:22px 22px 24px;}
+.panel h3{font-size:14px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600;margin-bottom:14px;}
+.panel + .panel{margin-top:16px;}
+
+.period-num{font-size:38px;color:var(--ink);}
+.period-of{font-family:"IBM Plex Mono",monospace;color:var(--ink-soft);font-size:13px;margin-bottom:18px;}
+.prompt{font-size:14.5px;line-height:1.55;color:var(--ink);margin:0 0 18px;}
+.prompt b{color:var(--teal-ink);}
+.pct-input-row{position:relative;}
+.pct-input-row input{font-size:26px;padding:14px 42px 14px 14px;text-align:right;}
+.pct-input-row input:placeholder-shown{font-size:13px;text-align:left;color:var(--ink-soft);font-family:"Work Sans",sans-serif;}
+.pct-suffix{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-family:"IBM Plex Mono",monospace;color:var(--ink-soft);font-size:20px;pointer-events:none;
+}
+.pct-input-row.locked input{background:var(--surface);border-color:var(--line);color:var(--ink-soft);}
+
+.osservato{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  background:var(--surface-2);border-radius:10px;padding:11px 13px;margin:0 0 14px;
+}
+.osservato .lbl{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-soft);line-height:1.35;
+}
+.osservato .val{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:23px;
+  color:var(--teal-ink);white-space:nowrap;
+}
+.osservato .val.vuoto{font-size:13px;font-weight:500;color:var(--ink-soft);}
+.reveal{margin-top:16px;border-top:1px dashed var(--line);padding-top:16px;}
+.reveal-row{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:6px;}
+.reveal-row .v{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:16px;}
+.chip{
+  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.03em;
+  padding:3px 9px;border-radius:20px;margin-top:8px;
+}
+.chip.flat{background:color-mix(in srgb, var(--teal) 16%, transparent);color:var(--teal-ink);}
+.chip.up{background:color-mix(in srgb, var(--rose) 16%, transparent);color:var(--rose-ink);}
+.chip.down{background:color-mix(in srgb, var(--accent) 18%, transparent);color:var(--accent-ink);}
+
+.chart-title{font-size:14px;font-weight:600;font-family:"Work Sans",sans-serif;color:var(--ink);margin-bottom:2px;}
+.chart-sub{font-size:12px;color:var(--ink-soft);margin-bottom:10px;}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink-soft);margin-bottom:8px;flex-wrap:wrap;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.swatch{width:16px;height:0;border-top:3px solid;display:inline-block;}
+.swatch.dash{border-top-style:dashed;}
+.swatch.dot{width:9px;height:9px;border-radius:50%;border:none;background:currentColor;}
+.empty-chart{
+  display:flex;align-items:center;justify-content:center;height:180px;
+  color:var(--ink-soft);font-size:13px;border:1px dashed var(--line);border-radius:10px;
+}
+svg.chart{width:100%;height:auto;display:block;overflow:visible;}
+svg.chart text{font-family:"IBM Plex Mono",monospace;fill:var(--ink-soft);}
+
+/* ---- end screen ---- */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:20px 0 24px;}
+.stat{background:var(--surface-2);border-radius:10px;padding:16px 16px 14px;}
+.stat .lbl{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);}
+.stat .val{font-family:"Fraunces",serif;font-weight:700;font-size:28px;margin-top:4px;color:var(--ink);}
+.foot-note{font-size:13px;color:var(--ink-soft);line-height:1.5;margin-top:22px;border-top:1px solid var(--line);padding-top:16px;}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var REALIZED = [2.2,1.9,1.95,2.0,2.1, 4.1,4.0,4.3,4.2,4.5,5.0,5.5,6.0,6.1,6.2,6.0,5.8,6.0,6.1];
+  var N = REALIZED.length;
+  var TARGET = 2.0;
+  var STORE_KEY = "inflation-expectations-en-v1";
+
+  // To collect results, create a Google Form with "Nickname" and "Result code".
+  // Use More > Pre-fill form, enter sample values, and click Get link.
+  // These three values will be filled in from that link when the form is ready.
+  // Until configured, students can copy their result code manually.
+  var TEACHER_FORM_BASE = "https://docs.google.com/forms/d/e/1FAIpQLScn-AM62axYlwGtvHyCiQ36A23vbZ01vo75bWGmsw4aki2LeA/viewform";
+  var TEACHER_FORM_ENTRY_NICK = "entry.825460949";
+  var TEACHER_FORM_ENTRY_CODE = "entry.625456480";
+
+  var state = {
+    screen: "intro",     // intro | game | end
+    nickname: "",
+    period: 0,           // 0-indexed period currently being forecast (0..N-1)
+    forecasts: new Array(N).fill(null),
+    revealed: false      // has current period's outcome been shown?
+  };
+
+  function save(){
+    try{
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        nickname: state.nickname, period: state.period,
+        forecasts: state.forecasts, revealed: state.revealed, screen: state.screen
+      }));
+    }catch(e){}
+  }
+  function restore(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return;
+      var s = JSON.parse(raw);
+      if(s && Array.isArray(s.forecasts) && s.forecasts.length===N){
+        state.nickname = s.nickname||"";
+        state.period = s.period||0;
+        state.forecasts = s.forecasts;
+        state.revealed = !!s.revealed;
+        state.screen = s.screen==="end"||s.screen==="game" ? s.screen : "intro";
+      }
+    }catch(e){}
+  }
+  function resetAll(){
+    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+    state = {screen:"intro", nickname:"", period:0, forecasts:new Array(N).fill(null), revealed:false};
+    render();
+  }
+
+  function enFmt(n, d){
+    d = d===undefined ? 2 : d;
+    var s = n.toFixed(d);
+    if(s==="-0"||s==="-0.00"||s==="-0,00") s = s.replace("-","");
+    return s;
+  }
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  // ---------------- risultato: codice compatto per il docente ----------------
+  function b64FromStr(str){
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(_, p1){
+      return String.fromCharCode(parseInt(p1, 16));
+    }));
+  }
+  function buildResultCode(){
+    var payload = { n: state.nickname, f: state.forecasts, ts: new Date().toISOString() };
+    return b64FromStr(JSON.stringify(payload));
+  }
+  function teacherFormLink(code){
+    if(!TEACHER_FORM_BASE || !TEACHER_FORM_ENTRY_NICK || !TEACHER_FORM_ENTRY_CODE) return null;
+    return TEACHER_FORM_BASE + "?usp=pp_url&" +
+      TEACHER_FORM_ENTRY_NICK + "=" + encodeURIComponent(state.nickname) + "&" +
+      TEACHER_FORM_ENTRY_CODE + "=" + encodeURIComponent(code);
+  }
+
+  // ---------------- chart rendering ----------------
+  function buildChart(opts){
+    // opts: {series:[{data:[{x,y}], color, dash, label}], yMin, yMax, xMax, refLines:[{y,label}], height}
+    var W = 640, H = opts.height || 230;
+    var pad = {l:38, r:14, t:14, b:24};
+    var innerW = W - pad.l - pad.r, innerH = H - pad.t - pad.b;
+    var xMax = opts.xMax;
+    function xPix(x){ return pad.l + (xMax<=1 ? innerW/2 : (x-1)/(xMax-1)*innerW); }
+    function yPix(y){ return pad.t + innerH - (y-opts.yMin)/(opts.yMax-opts.yMin)*innerH; }
+
+    var svg = "";
+    // gridlines
+    var steps = 4;
+    for(var i=0;i<=steps;i++){
+      var gy = opts.yMin + (opts.yMax-opts.yMin)*i/steps;
+      var py = yPix(gy);
+      svg += '<line x1="'+pad.l+'" y1="'+py.toFixed(1)+'" x2="'+(W-pad.r)+'" y2="'+py.toFixed(1)+'" stroke="var(--line)" stroke-width="1"/>';
+      svg += '<text x="'+(pad.l-6)+'" y="'+(py+3.5).toFixed(1)+'" font-size="10" text-anchor="end">'+enFmt(gy,1)+'</text>';
+    }
+    // reference lines
+    (opts.refLines||[]).forEach(function(r){
+      var py = yPix(r.y);
+      svg += '<line x1="'+pad.l+'" y1="'+py.toFixed(1)+'" x2="'+(W-pad.r)+'" y2="'+py.toFixed(1)+'" stroke="var(--ink-soft)" stroke-width="1.2" stroke-dasharray="3 4"/>';
+      svg += '<text x="'+(W-pad.r)+'" y="'+(py-5).toFixed(1)+'" font-size="10" text-anchor="end" font-weight="600">'+esc(r.label)+'</text>';
+    });
+    // x axis labels (sparse)
+    var everyN = xMax<=8?1: xMax<=14?2:3;
+    for(var xv=1; xv<=xMax; xv+=everyN){
+      svg += '<text x="'+xPix(xv).toFixed(1)+'" y="'+(H-6)+'" font-size="10" text-anchor="middle">'+xv+'</text>';
+    }
+    // annotations (vertical markers), drawn before series
+    (opts.markers||[]).forEach(function(m){
+      var px = xPix(m.x);
+      svg += '<line x1="'+px.toFixed(1)+'" y1="'+pad.t+'" x2="'+px.toFixed(1)+'" y2="'+(H-pad.b)+'" stroke="'+m.color+'" stroke-width="1" stroke-dasharray="2 3" opacity="0.65"/>';
+      svg += '<text x="'+px.toFixed(1)+'" y="'+(pad.t+10)+'" font-size="9.5" text-anchor="middle" fill="'+m.color+'" font-weight="600">'+esc(m.label)+'</text>';
+    });
+    // bars (for error chart)
+    if(opts.bars){
+      var slot = innerW/Math.max(xMax-1,1);
+      var bw = Math.min(18, slot*0.5);
+      opts.bars.forEach(function(pt){
+        var px = xPix(pt.x);
+        var y0 = yPix(0), y1 = yPix(pt.y);
+        var top = Math.min(y0,y1), h = Math.abs(y1-y0);
+        svg += '<rect x="'+(px-bw/2).toFixed(1)+'" y="'+top.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(h,1).toFixed(1)+'" fill="'+pt.color+'" rx="2"/>';
+      });
+      svg += '<line x1="'+pad.l+'" y1="'+yPix(0).toFixed(1)+'" x2="'+(W-pad.r)+'" y2="'+yPix(0).toFixed(1)+'" stroke="var(--ink)" stroke-width="1.3"/>';
+    }
+    // lines
+    (opts.series||[]).forEach(function(s){
+      if(!s.data.length) return;
+      var d = s.data.map(function(pt,i){ return (i===0?"M":"L")+xPix(pt.x).toFixed(1)+","+yPix(pt.y).toFixed(1); }).join(" ");
+      svg += '<path d="'+d+'" fill="none" stroke="'+s.color+'" stroke-width="2.4" stroke-dasharray="'+(s.dash||"none")+'" stroke-linecap="round" stroke-linejoin="round"/>';
+      s.data.forEach(function(pt){
+        svg += '<circle cx="'+xPix(pt.x).toFixed(1)+'" cy="'+yPix(pt.y).toFixed(1)+'" r="3" fill="'+s.color+'"/>';
+      });
+    });
+    return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'+svg+'</svg>';
+  }
+
+  function historyChart(uptoIdx, extraMarkers){ // periods 1..uptoIdx (1-indexed count), full-game x scale
+    if(uptoIdx<1){
+      return '<div class="empty-chart">No data yet: make your first forecast to begin.</div>';
+    }
+    var real=[], fore=[];
+    for(var i=0;i<uptoIdx;i++){
+      real.push({x:i+1, y:REALIZED[i]});
+      if(state.forecasts[i]!=null) fore.push({x:i+1, y:state.forecasts[i]});
+    }
+    var vals = real.map(function(p){return p.y;}).concat(fore.map(function(p){return p.y;})).concat([TARGET]);
+    var mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals);
+    var pad = Math.max((mx-mn)*0.2, 0.4);
+    return buildChart({
+      xMax:N, yMin:Math.floor((mn-pad)*10)/10, yMax:Math.ceil((mx+pad)*10)/10,
+      refLines:[{y:TARGET, label:"ECB target 2.0%"}],
+      markers:extraMarkers,
+      series:[
+        {data:real, color:"var(--teal)", dash:"none"},
+        {data:fore, color:"var(--accent)", dash:"6 5"}
+      ]
+    });
+  }
+
+  function errorChart(uptoIdx){
+    if(uptoIdx<1){
+      return '<div class="empty-chart">Your forecast error will appear here after the first period.</div>';
+    }
+    var bars=[];
+    for(var i=0;i<uptoIdx;i++){
+      if(state.forecasts[i]==null) continue;
+      var err = REALIZED[i]-state.forecasts[i];
+      bars.push({x:i+1, y:err, color: err>=0 ? "var(--rose)" : "var(--teal)"});
+    }
+    var vals = bars.map(function(b){return b.y;}).concat([0]);
+    var mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals);
+    var pad = Math.max((mx-mn)*0.25, 0.3);
+    return buildChart({
+      xMax:N, yMin:Math.floor((mn-pad)*10)/10, yMax:Math.ceil((mx+pad)*10)/10,
+      bars:bars, series:[]
+    });
+  }
+
+  // ---------------- screens ----------------
+  function screenIntro(){
+    var resumeNote = "";
+    if(state.period>0 || state.revealed){
+      resumeNote = '<p class="soft" style="margin-top:10px;font-size:13px;">Previous session found for <b class="mono">'+esc(state.nickname||"—")+'</b> (period '+(state.period+1)+' of '+N+'). Enter the same nickname and start to resume, or <button class="link-reset" id="btnReset">start a new simulation</button>.</p>';
+    }
+    return ''+
+    '<div class="card memo">'+
+      '<div class="memo-head">'+
+        '<div>'+
+          '<div class="eyebrow">Internal memo &middot; Economic Research Department</div>'+
+          '<h1>You have been hired as a consultant</h1>'+
+        '</div>'+
+        '<div class="badge"><span class="n">2.0%</span><span class="l">ECB target</span></div>'+
+      '</div>'+
+      '<p>A medium-sized manufacturing firm has hired you to monitor inflation, period by period. The next wage negotiation with the union depends on your inflation forecast. If your forecast is too low, workers lose purchasing power; if it is too high, the firm pays wage increases it cannot afford. Your goal is thus to forecast as precisely as possible.</p>'+
+      '<p class="soft">The central bank has publicly announced its objective: to keep inflation stable <b class="mono" style="color:var(--teal-ink)">at around 2.0%</b>. Start from this anchor, but pay attention to what you observe in each period.</p>'+
+      '<ol class="steps">'+
+        '<li><span class="num">1</span><span>In each period, enter your inflation forecast <b>before</b> seeing the actual outcome.</span></li>'+
+        '<li><span class="num">2</span><span>After you confirm your forecast, the actual inflation rate and your forecast error are revealed.</span></li>'+
+        '<li><span class="num">3</span><span>The simulation lasts '+N+' periods. Two charts track inflation, your forecasts, and your errors.</span></li>'+
+        '<li><span class="num">4</span><span>At the end, share your result with your instructor as directed.</span></li>'+
+      '</ol>'+
+      '<p class="soft" style="font-size:13px;">Your ranking is based on root mean squared error (RMSE): lower is better. Large forecast errors receive more weight.</p>'+
+      '<form id="introForm">'+
+        '<div class="form-row">'+
+          '<div class="field-wrap">'+
+            '<label class="field-label" for="nickname">Your nickname</label>'+
+            '<input type="text" id="nickname" maxlength="40" placeholder="e.g. consultant07" value="'+esc(state.nickname)+'" required>'+
+          '</div>'+
+          '<button type="submit" class="btn gold">Start simulation &rarr;</button>'+
+        '</div>'+
+      '</form>'+
+      resumeNote+
+    '</div>';
+  }
+
+  function feedbackChip(err){
+    if(Math.abs(err) < 0.3) return '<span class="chip flat">Forecast close to actual inflation</span>';
+    if(err > 0) return '<span class="chip up">Underestimate — inflation was higher than forecast</span>';
+    return '<span class="chip down">Overestimate — inflation was lower than forecast</span>';
+  }
+
+  function screenGame(){
+    var p = state.period;
+    var pastCount = p; // periods fully completed before this one
+    var dots = "";
+    for(var i=0;i<N;i++){
+      var cls = i<pastCount ? "done" : (i===p ? "now" : "");
+      dots += '<span class="dot '+cls+'"></span>';
+    }
+    var forecastVal = state.forecasts[p];
+    var lockedInput = state.revealed;
+
+    var inputBlock = '<div class="pct-input-row'+(lockedInput?' locked':'')+'">'+
+        '<input type="number" id="forecastInput" step="0.1" min="-5" max="20" '+
+        (lockedInput?'disabled':'')+' value="'+(forecastVal!=null?forecastVal:"")+'" placeholder="enter your forecast here">'+
+        '<span class="pct-suffix">%</span>'+
+      '</div>';
+
+    // l'inflazione effettiva dell'ultimo periodo gia' concluso: e' il dato
+    // che il consulente ha davanti quando formula la previsione
+    var osservato = "";
+    if(!lockedInput){
+      osservato = p>0
+        ? '<div class="osservato">'+
+            '<span class="lbl">Actual inflation<br>period '+p+'</span>'+
+            '<span class="val">'+enFmt(REALIZED[p-1])+'%</span>'+
+          '</div>'
+        : '<div class="osservato">'+
+            '<span class="lbl">Actual inflation</span>'+
+            '<span class="val vuoto">no completed periods yet</span>'+
+          '</div>';
+    }
+
+    var actionBlock;
+    if(!lockedInput){
+      actionBlock = '<button class="btn gold" id="btnSubmitForecast" style="width:100%;margin-top:14px;">Confirm forecast</button>';
+    } else {
+      var realized = REALIZED[p];
+      var err = realized - forecastVal;
+      var isLast = p === N-1;
+      actionBlock = '<div class="reveal">'+
+          '<div class="reveal-row"><span>Actual inflation, period '+(p+1)+'</span><span class="v mono" style="color:var(--teal-ink)">'+enFmt(realized)+'%</span></div>'+
+          '<div class="reveal-row"><span>Your forecast</span><span class="v mono" style="color:var(--accent-ink)">'+enFmt(forecastVal)+'%</span></div>'+
+          '<div class="reveal-row"><span>Error (actual &minus; forecast)</span><span class="v mono">'+(err>=0?"+":"")+enFmt(err)+' p.p.</span></div>'+
+          feedbackChip(err)+
+        '</div>'+
+        '<button class="btn" id="btnNext" style="width:100%;margin-top:16px;">'+(isLast?"View final summary &rarr;":"Next period &rarr;")+'</button>';
+    }
+
+    return ''+
+    '<div class="topbar">'+
+      '<div class="who">Consultant: <b>'+esc(state.nickname||"—")+'</b></div>'+
+      '<div class="timeline">'+dots+'</div>'+
+    '</div>'+
+    '<div class="game-grid">'+
+      '<div class="card panel">'+
+        '<div class="period-num mono" style="font-weight:700;">'+(p+1)+'</div>'+
+        '<div class="period-of">period '+(p+1)+' of '+N+'</div>'+
+        '<p class="prompt">The firm must set wage increases for this period. What is your forecast for the <b>inflation rate</b> in this period?</p>'+
+        osservato+
+        inputBlock+
+        actionBlock+
+      '</div>'+
+      '<div>'+
+        '<div class="card panel">'+
+          '<h3>Inflation history</h3>'+
+          '<div class="legend">'+
+            '<span><span class="swatch" style="border-color:var(--teal);color:var(--teal);"></span>actual</span>'+
+            '<span><span class="swatch dash" style="border-color:var(--accent);color:var(--accent);"></span>forecast</span>'+
+            '<span><span class="swatch" style="border-color:var(--ink-soft);color:var(--ink-soft);border-top-style:dashed;"></span>target 2.0%</span>'+
+          '</div>'+
+          historyChart(pastCount)+
+        '</div>'+
+        '<div class="card panel">'+
+          '<h3>Forecast error</h3>'+
+          '<div class="chart-sub">actual &minus; forecast, percentage points</div>'+
+          errorChart(pastCount)+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+
+  function screenEnd(){
+    var errs = [], absErrs=[];
+    for(var i=0;i<N;i++){
+      if(state.forecasts[i]==null) continue;
+      var e = REALIZED[i]-state.forecasts[i];
+      errs.push(e); absErrs.push(Math.abs(e));
+    }
+    var bias = errs.reduce(function(a,b){return a+b;},0)/errs.length;
+    var mae = absErrs.reduce(function(a,b){return a+b;},0)/absErrs.length;
+    var rmse = Math.sqrt(errs.reduce(function(a,b){return a+b*b;},0)/errs.length);
+    var worstIdx = 0, worstVal = -1;
+    for(var j=0;j<N;j++){
+      if(state.forecasts[j]==null) continue;
+      var av = Math.abs(REALIZED[j]-state.forecasts[j]);
+      if(av>worstVal){worstVal=av; worstIdx=j;}
+    }
+    var code = buildResultCode();
+    var formLink = teacherFormLink(code);
+    var shareBlock;
+    if(formLink){
+      shareBlock = '<div class="foot-note" style="border-top:1px solid var(--line);">'+
+          '<h3 style="margin-bottom:8px;">Share your result with your instructor</h3>'+
+          '<p style="font-size:13.5px;margin-bottom:12px;">Open the form with your result already filled in, then click Submit.</p>'+
+          '<a class="btn gold" href="'+esc(formLink)+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;">Send result to instructor &rarr;</a>'+
+        '</div>';
+    } else {
+      shareBlock = '<div class="foot-note" style="border-top:1px solid var(--line);">'+
+          '<h3 style="margin-bottom:8px;">Share your result with your instructor</h3>'+
+          '<p style="font-size:13.5px;margin-bottom:10px;">Copy this code and share it as directed in class. It contains your nickname, forecasts, and a timestamp.</p>'+
+          '<textarea id="resultCode" readonly rows="3" class="mono" style="width:100%;font-size:11px;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);resize:vertical;">'+esc(code)+'</textarea>'+
+          '<div style="margin-top:10px;display:flex;align-items:center;gap:10px;">'+
+            '<button class="btn secondary" id="btnCopyCode">Copy code</button>'+
+            '<span id="copyMsg" style="font-size:12px;color:var(--teal-ink);"></span>'+
+          '</div>'+
+        '</div>';
+    }
+    return ''+
+    '<div class="card memo">'+
+      '<div class="memo-head">'+
+        '<div>'+
+          '<div class="eyebrow">Final report &middot; '+esc(state.nickname||"—")+'</div>'+
+          '<h1>Simulation complete</h1>'+
+        '</div>'+
+        '<div class="badge" style="border-color:var(--accent);color:var(--accent-ink);"><span class="n" style="color:var(--accent);">'+N+'</span><span class="l">periods</span></div>'+
+      '</div>'+
+      '<p class="soft">Here is how your forecasts compared with actual inflation, from the first period to the last.</p>'+
+      '<div class="stat-grid">'+
+        '<div class="stat"><div class="lbl">Mean error (bias)</div><div class="val mono">'+(bias>=0?"+":"")+enFmt(bias,2)+'</div></div>'+
+        '<div class="stat"><div class="lbl">Mean absolute error</div><div class="val mono">'+enFmt(mae,2)+'</div></div>'+
+        '<div class="stat"><div class="lbl">RMSE</div><div class="val mono">'+enFmt(rmse,2)+'</div></div>'+
+        '<div class="stat"><div class="lbl">Largest absolute error</div><div class="val mono">period '+(worstIdx+1)+'</div></div>'+
+      '</div>'+
+      '<p class="soft" style="font-size:13px;">Errors are in percentage points. A positive bias means you underestimated inflation on average. The class ranking uses RMSE; lower is better.</p>'+
+      '<div class="legend">'+
+        '<span><span class="swatch" style="border-color:var(--teal);color:var(--teal);"></span>actual</span>'+
+        '<span><span class="swatch dash" style="border-color:var(--accent);color:var(--accent);"></span>forecast</span>'+
+      '</div>'+
+      historyChart(N, [{x:6,label:"shock",color:"var(--rose)"},{x:13,label:"stabilisation",color:"var(--ink-soft)"}])+
+      '<div style="margin-top:22px;">'+
+        '<button class="btn secondary" id="btnRestart">New simulation</button>'+
+      '</div>'+
+      shareBlock+
+      '<p style="font-size:13px;color:var(--ink-soft);margin-top:16px;">Your instructor will discuss with the class how your expectations developed over time, and why.</p>'+
+    '</div>';
+  }
+
+  // ---------------- render + wiring ----------------
+  function render(){
+    var app = document.getElementById("app");
+    if(state.screen==="intro") app.innerHTML = screenIntro();
+    else if(state.screen==="game") app.innerHTML = screenGame();
+    else app.innerHTML = screenEnd();
+    wire();
+  }
+
+  function wire(){
+    if(state.screen==="intro"){
+      var f = document.getElementById("introForm");
+      if(f) f.addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var nick = document.getElementById("nickname").value.trim();
+        state.nickname = nick || "student";
+        state.screen = "game";
+        save();
+        render();
+      });
+      var br = document.getElementById("btnReset");
+      if(br) br.addEventListener("click", function(){ resetAll(); });
+    } else if(state.screen==="game"){
+      var btn = document.getElementById("btnSubmitForecast");
+      if(btn) btn.addEventListener("click", function(){
+        var inp = document.getElementById("forecastInput");
+        var v = parseFloat((inp.value||"").replace(",", "."));
+        if(isNaN(v)){ inp.focus(); inp.style.borderColor="var(--rose)"; return; }
+        state.forecasts[state.period] = v;
+        state.revealed = true;
+        save();
+        render();
+      });
+      var inp2 = document.getElementById("forecastInput");
+      if(inp2) inp2.addEventListener("keydown", function(ev){
+        if(ev.key==="Enter"){ ev.preventDefault(); var b=document.getElementById("btnSubmitForecast"); if(b) b.click(); }
+      });
+      var nb = document.getElementById("btnNext");
+      if(nb) nb.addEventListener("click", function(){
+        if(state.period >= N-1){
+          state.screen = "end";
+        } else {
+          state.period += 1;
+          state.revealed = false;
+        }
+        save();
+        render();
+      });
+    } else {
+      var rb = document.getElementById("btnRestart");
+      if(rb) rb.addEventListener("click", function(){ resetAll(); });
+      var cb = document.getElementById("btnCopyCode");
+      if(cb) cb.addEventListener("click", function(){
+        var ta = document.getElementById("resultCode");
+        var msg = document.getElementById("copyMsg");
+        function ok(){ if(msg) msg.textContent = "Copied to clipboard."; }
+        function fail(){
+          ta.focus(); ta.select();
+          try{ document.execCommand("copy"); ok(); }
+          catch(e){ if(msg) msg.textContent = "Select the text and copy it manually."; }
+        }
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(ta.value).then(ok, fail);
+        } else {
+          fail();
+        }
+      });
+    }
+  }
+
+  restore();
+  render();
+})();
+</script>
+
+</body>
+</html>
