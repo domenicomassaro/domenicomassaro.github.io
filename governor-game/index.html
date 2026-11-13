@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>The Governor</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap">
+
+<style>
+:root{
+  color-scheme: light;
+  --paper:      #e9edf1;
+  --surface:    #fbfcfd;
+  --surface-2:  #f1f4f7;
+  --ink:        #10151c;
+  --ink-2:      #48566a;
+  --muted:      #7c8a9c;
+  --hair:       #d7dee6;
+  --hair-soft:  #e6ebf0;
+  --accent:     #14566b;
+  --accent-ink: #ffffff;
+  --accent-soft:#dceaf0;
+  --tu:         #2a78d6;
+  --fed:        #eb6834;
+  --warn:       #9a4a10;
+  --shadow:     0 1px 2px rgba(16,21,28,.06), 0 8px 24px -12px rgba(16,21,28,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:      #0b0f14;
+    --surface:    #151b22;
+    --surface-2:  #1c232c;
+    --ink:        #f2f5f8;
+    --ink-2:      #b3c0cf;
+    --muted:      #7f8c9b;
+    --hair:       #28323d;
+    --hair-soft:  #202932;
+    --accent:     #5fa8bf;
+    --accent-ink: #06171d;
+    --accent-soft:#15303a;
+    --tu:         #3987e5;
+    --fed:        #d95926;
+    --warn:       #e0a06a;
+    --shadow:     0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:      #0b0f14;
+  --surface:    #151b22;
+  --surface-2:  #1c232c;
+  --ink:        #f2f5f8;
+  --ink-2:      #b3c0cf;
+  --muted:      #7f8c9b;
+  --hair:       #28323d;
+  --hair-soft:  #202932;
+  --accent:     #5fa8bf;
+  --accent-ink: #06171d;
+  --accent-soft:#15303a;
+  --tu:         #3987e5;
+  --fed:        #d95926;
+  --warn:       #e0a06a;
+  --shadow:     0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  font-size:15px; line-height:1.5;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:20px 20px 56px}
+
+header.top{
+  display:flex; flex-wrap:wrap; align-items:flex-end; gap:16px 24px;
+  padding-bottom:14px; margin-bottom:20px;
+  border-bottom:2px solid var(--ink);
+}
+.brand h1{margin:0; font-size:27px; font-weight:600; letter-spacing:-.02em; text-wrap:balance}
+.brand p{margin:3px 0 0; color:var(--ink-2); font-size:13.5px; max-width:62ch}
+.avanz{margin-left:auto; text-align:right; display:flex; align-items:flex-end; gap:18px}
+.avanz .q{
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12px;
+  color:var(--muted); text-transform:uppercase; letter-spacing:.09em;
+}
+.barra{width:190px; height:5px; background:var(--hair); margin-top:7px; overflow:hidden}
+.barra i{display:block; height:100%; background:var(--accent); width:0; transition:width .35s ease}
+
+.griglia{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:20px; align-items:start}
+@media (max-width:900px){ .griglia{grid-template-columns:1fr} }
+
+.pannello{background:var(--surface); border:1px solid var(--hair); box-shadow:var(--shadow)}
+.pannello > h2{
+  margin:0; padding:12px 18px; font-size:11.5px; font-weight:600;
+  letter-spacing:.11em; text-transform:uppercase; color:var(--ink-2);
+  border-bottom:1px solid var(--hair-soft); background:var(--surface-2);
+}
+
+.riunione{padding:16px 18px 4px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+.riunione .trim{font-family:"IBM Plex Mono",monospace; font-size:25px; font-weight:600}
+.riunione .data{color:var(--muted); font-size:13px}
+.blocchi{padding:4px 18px 18px; display:flex; flex-direction:column; gap:16px}
+.blocco h3{
+  margin:0 0 5px; font-size:11px; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--accent);
+}
+.blocco p{
+  margin:0; font-family:"IBM Plex Serif",Georgia,serif; font-size:14.5px;
+  line-height:1.62; color:var(--ink);
+}
+.fonte{
+  display:block; margin-top:5px; font-family:"IBM Plex Sans",sans-serif;
+  font-size:11.5px; color:var(--muted);
+}
+
+.tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--hair-soft)}
+.tile{background:var(--surface); padding:12px 14px}
+.tile .k{font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); white-space:nowrap}
+.tile .v{
+  font-family:"IBM Plex Mono",monospace; font-size:21px; font-weight:500;
+  font-variant-numeric:tabular-nums; margin-top:3px;
+}
+.tile .v.alta{color:var(--warn)}
+.tile .v.neg{color:var(--tu)}
+
+.decide{padding:16px 18px 18px; display:flex; flex-direction:column; gap:12px}
+.decide label{font-size:12.5px; color:var(--ink-2)}
+.riga-input{display:flex; align-items:center; gap:10px}
+.riga-input input[type=number]{
+  width:108px; padding:9px 10px; font-family:"IBM Plex Mono",monospace;
+  font-size:20px; font-weight:500; text-align:right;
+  background:var(--surface-2); color:var(--ink); border:1px solid var(--hair); border-radius:0;
+}
+.riga-input .pct{font-family:"IBM Plex Mono",monospace; font-size:17px; color:var(--muted)}
+input[type=range]{flex:1; min-width:120px; accent-color:var(--accent)}
+.nudge{display:flex; gap:6px; flex-wrap:wrap}
+.nudge button{
+  font-family:"IBM Plex Mono",monospace; font-size:12.5px; padding:6px 9px;
+  background:var(--surface-2); color:var(--ink-2); border:1px solid var(--hair); cursor:pointer;
+}
+.nudge button:hover{background:var(--accent-soft); color:var(--ink); border-color:var(--accent)}
+.azioni{display:flex; gap:10px; margin-top:2px}
+button.primario{
+  flex:1; padding:11px 16px; font-size:14.5px; font-weight:600;
+  background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent); cursor:pointer;
+}
+button.primario:hover{filter:brightness(1.08)}
+button.secondario{
+  padding:11px 14px; font-size:13px; background:transparent; color:var(--ink-2);
+  border:1px solid var(--hair); cursor:pointer;
+}
+button.secondario:hover{border-color:var(--ink-2); color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+.sugg{padding:10px 12px; border-left:2px solid var(--fed); background:var(--surface-2); font-size:12.5px; color:var(--ink-2)}
+.sugg h4{
+  margin:0 0 4px; font-size:10.5px; font-weight:600; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--fed);
+}
+.sugg b{font-family:"IBM Plex Mono",monospace; color:var(--ink); font-size:14px; font-variant-numeric:tabular-nums}
+.sugg .avviso{display:block; margin-top:5px; font-size:11.5px; color:var(--muted)}
+button.aiuto{
+  width:100%; padding:9px 14px; font-size:12.5px; background:transparent;
+  color:var(--fed); border:1px solid var(--fed); cursor:pointer;
+}
+button.aiuto:hover{background:var(--fed); color:var(--surface)}
+button.aiuto[disabled]{opacity:.4; cursor:default}
+button.aiuto[disabled]:hover{background:transparent; color:var(--fed)}
+
+.esito{
+  padding:12px 18px; border-top:1px solid var(--hair-soft); background:var(--surface-2);
+  font-family:"IBM Plex Mono",monospace; font-size:13px; font-variant-numeric:tabular-nums;
+  display:grid; grid-template-columns:1fr 1fr; gap:4px 14px; color:var(--ink-2);
+}
+.esito b{color:var(--ink); font-weight:600}
+
+.guida-corpo{padding:20px 22px 24px; max-width:74ch}
+.guida-corpo > p{margin:0 0 14px; font-size:14.5px; line-height:1.62}
+.guida-corpo .occhiello{
+  font-family:"IBM Plex Serif",Georgia,serif; font-size:16px; line-height:1.55;
+  color:var(--ink); border-left:2px solid var(--accent); padding-left:14px;
+}
+.guida-corpo h3{
+  margin:26px 0 10px; font-size:11.5px; font-weight:600; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--accent);
+  padding-bottom:6px; border-bottom:1px solid var(--hair-soft);
+}
+.formule{
+  display:grid; grid-template-columns:auto 1fr; gap:7px 16px; align-items:baseline;
+  background:var(--surface-2); padding:14px 16px; margin:0 0 14px; border-left:2px solid var(--hair);
+}
+.formule span{font-size:12px; color:var(--muted); white-space:nowrap}
+.sopralinea{text-decoration:overline}
+.formule code{
+  font-family:"IBM Plex Mono",monospace; font-size:13.5px; color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+dl.anatomia{margin:0}
+dl.anatomia dt{font-size:13px; font-weight:600; color:var(--ink); margin-top:14px}
+dl.anatomia dt:first-child{margin-top:0}
+dl.anatomia dd{
+  margin:3px 0 0 0; padding-left:13px; border-left:2px solid var(--hair-soft);
+  font-size:13.5px; line-height:1.6; color:var(--ink-2);
+}
+dl.anatomia dd em{color:var(--ink); font-style:normal; font-weight:500}
+.avvio{margin-top:28px}
+button.grande{
+  width:100%; padding:15px 20px; font-size:16px; font-weight:600;
+  background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent); cursor:pointer;
+}
+button.grande:hover{filter:brightness(1.08)}
+.torna{
+  background:none; border:0; padding:0; cursor:pointer; font-size:12px;
+  color:var(--muted); text-decoration:underline; text-underline-offset:3px; font-family:inherit;
+}
+.torna:hover{color:var(--accent)}
+
+.grafici{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px}
+@media (max-width:900px){ .grafici{grid-template-columns:1fr} }
+.card-graf{background:var(--surface); border:1px solid var(--hair); padding:12px 12px 6px; position:relative; box-shadow:var(--shadow)}
+.card-graf h3{margin:0 0 2px; font-size:12px; font-weight:600; color:var(--ink)}
+.card-graf .leg{display:flex; gap:12px; flex-wrap:wrap; margin:4px 0 6px; font-size:11px; color:var(--ink-2)}
+.card-graf .leg span{display:inline-flex; align-items:center; gap:5px}
+.sw{width:13px; height:2.5px; display:inline-block}
+.sw.d{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px)}
+.card-graf svg{display:block; width:100%; height:auto; overflow:visible}
+.tip{
+  position:absolute; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--ink); color:var(--paper); padding:6px 8px; font-size:11.5px;
+  font-family:"IBM Plex Mono",monospace; white-space:nowrap; z-index:5;
+  transform:translate(-50%,-118%);
+}
+
+.taylor{
+  display:grid; grid-template-columns:minmax(0,440px) minmax(0,1fr);
+  gap:18px; align-items:start; margin-top:18px;
+}
+@media (max-width:820px){ .taylor{grid-template-columns:1fr} }
+.taylor .nota{margin-top:0}
+.verdetto-esito{
+  margin-top:10px; padding:10px 12px; font-size:13px; border-left:2px solid var(--fed);
+  background:var(--surface-2); color:var(--ink);
+}
+.verdetto-esito.ok{border-left-color:var(--accent)}
+.verdetto-esito b{font-weight:600}
+.verdetto{padding:18px}
+.verdetto .titolo{font-size:20px; font-weight:600; margin:0 0 4px}
+.verdetto .sub{color:var(--ink-2); font-size:13.5px; margin:0 0 14px; max-width:70ch}
+.score{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--hair-soft)}
+.score .tile .v{font-size:24px}
+.nota{
+  margin-top:14px; padding:11px 13px; border-left:2px solid var(--accent);
+  background:var(--surface-2); font-size:13px; color:var(--ink-2); max-width:76ch;
+}
+table.dati{width:100%; border-collapse:collapse; font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-variant-numeric:tabular-nums}
+table.dati th,table.dati td{padding:4px 8px; text-align:right; border-bottom:1px solid var(--hair-soft)}
+table.dati th{color:var(--muted); font-weight:500; position:sticky; top:0; background:var(--surface)}
+table.dati td:first-child,table.dati th:first-child{text-align:left}
+details.tabella{margin-top:16px}
+details.tabella summary{cursor:pointer; font-size:12.5px; color:var(--ink-2); padding:6px 0}
+.scroll-x{overflow-x:auto; max-height:340px; overflow-y:auto; border:1px solid var(--hair)}
+.reaction-rule{margin-top:20px}
+.reaction-rule .verdetto > p{font-size:13.5px;line-height:1.65;color:var(--ink-2)}
+.reaction-equation{overflow-x:auto;background:var(--surface-2);border-left:2px solid var(--accent);padding:14px 16px;font-family:"IBM Plex Mono",monospace;font-size:15px;white-space:nowrap}
+.reaction-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0}
+.reaction-table th,.reaction-table td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--hair-soft)}
+.reaction-table th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.reaction-table td:last-child{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.reaction-table th:last-child,.reaction-table td:last-child{text-align:right}
+.reaction-feedback p{margin:8px 0;font-size:13.5px;line-height:1.65}
+[hidden]{display:none !important}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important} }
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <h1>The Governor</h1>
+    <p>You lead the central bank of an economy initially in equilibrium.
+       Over thirty periods, you set the interest rate: your task is
+       to keep inflation at 2%.</p>
+  </div>
+  <div class="avanz">
+    <div>
+      <button class="torna" id="btnGuida">how it works</button>
+      <div class="q" id="avanzTesto">period 1 of 29</div>
+      <div class="barra"><i id="avanzBarra"></i></div>
+    </div>
+  </div>
+</header>
+
+<section id="schermoIntro">
+  <div class="pannello">
+    <h2>How it works</h2>
+    <div class="guida-corpo">
+
+      <p class="occhiello">You are the governor of the central bank. The economy starts in medium-run equilibrium: output and natural output are both 100 (index), inflation is 2%, and the real interest rate is 2%. Over 29 decisions, you must keep inflation as close as possible to the 2% target while responding to shocks.</p>
+      <h3>The IS&ndash;LM&ndash;PC model</h3>
+      <div class="formule">
+        <span>IS (reduced form)</span><code>Y = 100 + &theta; &minus; 0.9(r &minus; 2)</code>
+        <span>LM (central bank choice)</span><code>r = real interest rate chosen by you</code>
+        <span>natural output</span><code>Y<sub>n</sub> = 100 + s</code>
+        <span>output gap</span><code>gap = Y &minus; Y<sub>n</sub></code>
+        <span>Accelerationist PC</span><code>&pi;<sub>t</sub> = &pi;<sub>t&minus;1</sub> + 0.1 &middot; gap</code>
+      </div>
+      <p>The <strong>IS curve</strong> describes the negative relationship between output and the real interest rate; the <strong>horizontal LM curve</strong> indicates that the central bank chooses the rate. Holding shocks constant, raising the rate reduces output; lowering it increases output. The 2% rate is the <em>reference rate</em> that keeps output at its natural level in the absence of the effects of shocks: it is not always the stabilising rate.</p>
+      <p>For simplicity, you choose the <strong>real interest rate</strong> directly, rather than the nominal rate. Output is represented by an index: 100 is the initial level, not 100 euros or the actual GDP of a country. The <em>gap</em> is the difference between two indices, expressed in <strong>index points</strong>, not a percentage calculated by dividing by natural output.</p>
+      <p>The <strong>PC with adaptive expectations</strong> implies that inflation rises when Y exceeds Y<sub>n</sub> and falls when Y is below Y<sub>n</sub>. When Y = Y<sub>n</sub>, inflation remains constant, <strong>but does not automatically return to 2%</strong>. Bringing inflation back to target after a deviation may require a temporary nonzero output gap.</p>
+      <h3>Shocks</h3>
+      <p><strong>Demand</strong> shocks shift the IS curve through &theta;. <strong>Supply</strong> shocks are interpreted, as in the course, through changes in firms' <strong>markups</strong>: a higher markup reduces natural output Y<sub>n</sub>; a lower markup increases it. In the game, the shock changes Y<sub>n</sub> directly, without simulating a specific markup equation.</p>
+      <p>Shocks arrive in predetermined periods that you do not know in advance. Their effects persist and decay by 40% in each subsequent period. Research department reports signal only the arrival of <em>new</em> shocks: no new shock does not mean that the effects of previous shocks have disappeared.</p>
+      <h3>The game screen</h3>
+      <dl class="anatomia">
+        <dt>Research department reports</dt><dd>Signal new demand impulses and new changes in markups, which affect natural output.</dd>
+        <dt>Your decision</dt><dd>You observe inflation, the output gap, and the previous interest rate, then set the real interest rate for the new period. You can use the number field, slider, or shortcut buttons. Rates can be set in increments of 0.05 percentage points and can be negative.</dd>
+        <dt>Research department hint</dt><dd>Provides an approximate interval containing the rate that would <strong>close the output gap</strong> and therefore keep <strong>inflation constant</strong>. If inflation is already away from 2%, that rate will not necessarily bring it back to target. The game counts how many times you view the research department's hints.</dd>
+        <dt>Period outcome</dt><dd>Shows the output gap, output index, and new inflation rate.</dd>
+        <dt>Charts</dt><dd>Track the output gap, inflation relative to target, and your chosen interest rate relative to the 2% reference rate over time.</dd>
+        <dt>At the end</dt><dd>You receive an assessment of your term, summary indicators, charts comparing your decisions with a benchmark policy, an estimate of your interest-rate reaction rule, and a data table. You can also end your term early.</dd>
+      </dl>
+      <h3>How performance is measured</h3>
+      <p>Your <strong>loss</strong> is the mean absolute deviation of inflation from the 2% target: a lower value means better performance. You are compared with a <strong>benchmark policy of perfect stabilisation</strong> that starts at 2%, closes the output gap in every period, and therefore keeps inflation at target throughout. This is an ideal benchmark: it knows the shocks exactly, whereas you receive less precise information.</p>
+      <div class="avvio">
+        <button class="grande" id="btnInizia">Start the game</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="schermoGioco" hidden>
+  <div class="griglia">
+
+    <section class="pannello" aria-labelledby="h-brief">
+      <h2 id="h-brief">Research department reports</h2>
+      <div class="riunione">
+        <span class="trim" id="etichettaPeriodo">Period 2</span>
+        <span class="data" id="sottoPeriodo"></span>
+      </div>
+      <div class="blocchi">
+        <div class="blocco">
+          <h3>Demand conditions</h3>
+          <p id="txtDomanda"></p>
+        </div>
+        <div class="blocco">
+          <h3>Supply conditions</h3>
+          <p id="txtCosti"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pannello" aria-labelledby="h-dec">
+      <h2 id="h-dec">Your decision</h2>
+      <div class="tiles">
+        <div class="tile"><div class="k">Inflation</div><div class="v" id="vInfl">2.00%</div></div>
+        <div class="tile"><div class="k">Output gap (index points)</div><div class="v" id="vGap">0.00%</div></div>
+        <div class="tile"><div class="k">Current interest rate</div><div class="v" id="vTasso">2.00%</div></div>
+      </div>
+      <div class="decide">
+        <label for="tasso">Interest rate for <b id="etichettaP2">period 2</b></label>
+        <div class="riga-input">
+          <input type="number" id="tasso" step="0.05" min="-25" max="35" value="2.00">
+          <span class="pct">%</span>
+          <input type="range" id="slider" step="0.05" min="-8" max="16" value="2.00" aria-label="Interest rate">
+        </div>
+        <div class="nudge">
+          <button data-d="-1">&minus;1.00</button>
+          <button data-d="-0.5">&minus;0.50</button>
+          <button data-d="-0.25">&minus;0.25</button>
+          <button data-d="0.25">+0.25</button>
+          <button data-d="0.5">+0.50</button>
+          <button data-d="1">+1.00</button>
+          <button data-d="invariato">unchanged</button>
+        </div>
+        <div class="azioni">
+          <button class="primario" id="btnConferma">Set the rate</button>
+          <button class="secondario" id="btnFine">End your term</button>
+        </div>
+        <button class="aiuto" id="btnSugg">Research department hint</button>
+        <div class="sugg" id="boxSugg" hidden>
+          <h4>Research department hint</h4>
+          The rate that would close the gap and keep inflation constant lies between
+          <b id="sBassa"></b> and <b id="sAlta"></b>.
+          <span class="avviso" id="sNota"></span><span class="avviso">This is not necessarily the rate that brings inflation back to 2%.</span>
+        </div>
+      </div>
+      <div class="esito" id="esito" hidden>
+        <span>Output gap (index points)</span><b id="eGap">&mdash;</b>
+        <span>Output (index)</span><b id="eY">&mdash;</b>
+        <span>Inflation (%)</span><b id="eInfl">&mdash;</b>
+        <span>Change (pp)</span><b id="eD">&mdash;</b>
+      </div>
+    </section>
+  </div>
+
+  <div class="grafici">
+    <div class="card-graf">
+      <h3>Output gap (index points)</h3>
+      <div class="leg"><span><i class="sw" style="background:var(--tu)"></i>you</span></div>
+      <div id="gGap"></div><div class="tip"></div>
+    </div>
+    <div class="card-graf">
+      <h3>Inflation (%)</h3>
+      <div class="leg"><span><i class="sw" style="background:var(--tu)"></i>you</span>
+        <span><i class="sw d" style="color:var(--muted)"></i>target 2%</span></div>
+      <div id="gInfl"></div><div class="tip"></div>
+    </div>
+    <div class="card-graf">
+      <h3>Real interest rate (%)</h3>
+      <div class="leg"><span><i class="sw" style="background:var(--tu)"></i>you</span>
+        <span><i class="sw d" style="color:var(--muted)"></i>reference 2%</span></div>
+      <div id="gTassi"></div><div class="tip"></div>
+    </div>
+  </div>
+</div>
+
+<div id="schermoFine" hidden>
+  <section class="pannello">
+    <h2>Your term in review</h2>
+    <div class="verdetto">
+      <p class="titolo" id="titoloEsito"></p>
+      <p class="sub" id="sottoEsito"></p>
+      <div class="score">
+        <div class="tile"><div class="k">Your loss</div><div class="v" id="sTu"></div></div>
+        <div class="tile"><div class="k">Maximum inflation</div><div class="v" id="sMax"></div></div>
+        <div class="tile"><div class="k">Minimum inflation</div><div class="v" id="sMin"></div></div>
+        <div class="tile"><div class="k">Largest gap (index points)</div><div class="v" id="sGap"></div></div>
+        
+        <div class="tile"><div class="k">Hints used</div><div class="v" id="sAiuti"></div></div>
+      </div>
+      <div class="nota">The benchmark policy closes the output gap in every period. If inflation were already away from 2%, closing the gap would keep it constant at its new level: it would not automatically bring it back to target.</div>
+      <div class="azioni" style="margin-top:16px">
+        <button class="primario" id="btnRigioca" style="flex:0 0 auto">New term</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="grafici">
+    <div class="card-graf">
+      <h3>Output gap (index points)</h3>
+      <div class="leg"><span><i class="sw" style="background:var(--tu)"></i>you</span>
+        <span><i class="sw d" style="color:var(--fed)"></i>stabilisation</span></div>
+      <div id="fGap"></div><div class="tip"></div>
+    </div>
+    <div class="card-graf">
+      <h3>Inflation (%)</h3>
+      <div class="leg"><span><i class="sw" style="background:var(--tu)"></i>you</span>
+        <span><i class="sw d" style="color:var(--fed)"></i>stabilisation</span></div>
+      <div id="fInfl"></div><div class="tip"></div>
+    </div>
+    <div class="card-graf">
+      <h3>Real interest rate (%)</h3>
+      <div class="leg"><span><i class="sw" style="background:var(--tu)"></i>you</span>
+        <span><i class="sw d" style="color:var(--fed)"></i>stabilising rate</span></div>
+      <div id="fTasso"></div><div class="tip"></div>
+    </div>
+  </div>
+
+  <section class="pannello reaction-rule" id="reactionPanel" aria-labelledby="reactionHeading" hidden>
+    <h2 id="reactionHeading">Your estimated Taylor rule</h2>
+    <div class="verdetto">
+      <p>How did your interest-rate decisions relate to the economy you observed? This estimate summarises your choices using the previous period's inflation and output gap.</p>
+      <div class="reaction-equation" aria-label="Estimated real interest rate rule">r&#770;<sub>t</sub> = <span id="ruleA">a</span> <span id="ruleB">+ b</span>(&pi;<sub>t&minus;1</sub> &minus; 2) <span id="ruleC">+ c</span>gap<sub>t&minus;1</sub></div>
+      <p>You chose the <strong>real interest rate</strong> r<sub>t</sub>. Inflation and the interest rate are measured in percent; the output gap is measured in index points. This rule uses the information displayed before each decision.</p>
+      <p id="ruleStatus" role="status"></p>
+      <div id="ruleResults" hidden>
+        <table class="reaction-table">
+          <thead><tr><th scope="col">Estimated coefficient</th><th scope="col">Value</th></tr></thead>
+          <tbody>
+            <tr><td>Rate at 2% inflation and a zero output gap (a)</td><td id="ruleIntercept"></td></tr>
+            <tr><td>Response to inflation (b)</td><td id="ruleInflation"></td></tr>
+            <tr><td>Response to the output gap (c)</td><td id="ruleGap"></td></tr>
+          </tbody>
+        </table>
+        <div class="reaction-feedback" id="ruleFeedback"></div>
+        <p id="ruleFit"></p>
+        <div class="nota">Estimated by ordinary least squares using your completed decisions, excluding the initial equilibrium. These coefficients describe associations in this game; they do not establish causal effects. The fit may be imprecise in a short term, and responses to the research reports or other decision patterns are not included in this rule.</div>
+      </div>
+    </div>
+  </section>
+
+  <details class="tabella">
+    <summary>Show the data</summary>
+    <div class="scroll-x"><table class="dati" id="tabDati"></table></div>
+  </details>
+</div>
+
+</div>
+
+<script>
+/* ===================== modello e shock =====================
+   Stessa struttura del codice MATLAB originale, riscritta in punti
+   percentuali: la' theta e yn erano in frazioni (0.1) mentre pi era in
+   percento, qui e' tutto in %. Moltiplicando y, yn e theta per 100 le due
+   formulazioni coincidono esattamente:
+      MATLAB:  y = theta - 3*(r/100 - 0.02)      pi = pi(-1) + 3*(y - yn)
+      qui:     y = theta - 3*(r - 2)             pi = pi(-1) + 0.03*gap
+   Impulsi, sigma e kappa sono poi riscalati di 1/3.33 (impulso 10 -> 3,
+   sigma 3 -> 0.9, kappa 0.03 -> 0.1): la trasformazione lascia inalterati il
+   sentiero dell'inflation e i tassi da fissare, e riporta l'output gap a
+   valori di grandezza realistica invece di oscillare fra -12% e +13%.     */
+const T = 30, RBAR = 2, SIG = 0.9, KAPPA = 0.1, TGT = 2; // livelli visualizzati: Y=100+y, Yn=100+yn
+
+const TH = new Array(T).fill(0), YN = new Array(T).fill(0);
+const sTheta = new Array(T).fill(0), sYn = new Array(T).fill(0);
+sTheta[2] = 3; sTheta[9] = -3; sTheta[16] = 3;         // periodi 3, 10, 17
+sYn[6] = 3;    sYn[14] = -3;   sYn[21] = 3;            // periodi 7, 15, 22
+for(let i = 1; i < T; i++){
+  TH[i] = 0.6 * TH[i-1] + sTheta[i];
+  YN[i] = 0.6 * YN[i-1] + sYn[i];
+}
+/* tasso che chiude l'output gap, e quindi lascia l'inflation dov'e' */
+const RSTAR = TH.map((v, i) => RBAR + (v - YN[i]) / SIG);
+const nomi = Array.from({length: T}, (_, i) => 'P' + (i + 1));
+
+let t, r, infl, y, gap, tf, aiuti;
+
+function avvia(){
+  t = 1;
+  r = new Array(T).fill(null); infl = new Array(T).fill(null);
+  y = new Array(T).fill(null); gap = new Array(T).fill(null);
+  r[0] = RBAR; infl[0] = TGT; y[0] = 0; gap[0] = 0;
+  tf = 0; aiuti = 0;
+  document.getElementById('schermoFine').hidden = true;
+  document.getElementById('esito').hidden = true;
+  mostraPeriodo();
+}
+
+function passo(tasso){
+  r[t] = tasso;
+  y[t] = TH[t] - SIG * (r[t] - RBAR);
+  gap[t] = y[t] - YN[t];
+  infl[t] = infl[t-1] + KAPPA * gap[t];
+  tf = t;
+}
+
+/* ===================== utilita' ===================== */
+const $ = s => document.querySelector(s);
+const num = (v, d=2) => (v===null||v===undefined||!isFinite(v)) ? '\u2014' : v.toFixed(d);
+const pct = (v, d=2) => num(v,d) + '%';
+const griglia = v => +(((Math.sign(v) || 1) * Math.round(Math.abs(v) / 0.05) * 0.05).toFixed(2));
+
+function ols(xs, ys){
+  const n = xs.length; if(n < 2) return NaN;
+  const mx = xs.reduce((a,b)=>a+b,0)/n, my = ys.reduce((a,b)=>a+b,0)/n;
+  let sxy=0, sxx=0;
+  for(let i=0;i<n;i++){ sxy += (xs[i]-mx)*(ys[i]-my); sxx += (xs[i]-mx)**2; }
+  return sxx === 0 ? NaN : sxy/sxx;
+}
+
+/* ===================== rapporti del centro di ricerca =====================
+   Come nell'originale, il rapporto segnala l'impulso del periodo corrente. */
+function testoDomanda(i){
+  if(sTheta[i] > 0) return 'We are observing a sharp increase in demand.';
+  if(sTheta[i] < 0) return 'We are observing a sharp decrease in demand.';
+  return 'Demand is stable: we detect no new impulses this period.';
+}
+function testoCosti(i){
+  if(sYn[i] > 0) return 'Firms have reduced their markups: natural output is increasing.';
+  if(sYn[i] < 0) return 'Firms have increased their markups: natural output is decreasing.';
+  return 'No new change in markups this period.';
+}
+
+/* ===================== grafico ===================== */
+function disegna(hostId, opt){
+  const host = document.getElementById(hostId);
+  const W = 420, H = 232, mL = 42, mR = 14, mT = 10, mB = 34;
+  const px = i => mL + i * (W - mL - mR) / (T - 1);
+
+  let vals = [];
+  opt.serie.forEach(s => s.v.forEach(v => { if(v !== null && isFinite(v)) vals.push(v); }));
+  (opt.rif||[]).forEach(rf => vals.push(rf.v));
+  if(!vals.length) vals = [0,1];
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if(hi - lo < 1e-9){ hi += 1; lo -= 1; }
+  const pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
+  const py = v => mT + (H - mT - mB) * (1 - (v - lo) / (hi - lo));
+
+  const grezzo = (hi - lo) / 4;
+  const mag = Math.pow(10, Math.floor(Math.log10(grezzo)));
+  const passo = [1,2,2.5,5,10].map(m=>m*mag).find(s=>s>=grezzo) || 10*mag;
+  // Etichette con precisione adeguata anche a variazioni molto piccole.
+  // Evita che 1.98, 1.99 e 2.00 siano tutti mostrati come 2.0.
+  const decimali = Math.min(6, Math.max(0, Math.ceil(-Math.log10(passo)) + (Math.abs(passo * Math.pow(10, Math.ceil(-Math.log10(passo))) - Math.round(passo * Math.pow(10, Math.ceil(-Math.log10(passo))))) > 1e-8 ? 1 : 0)));
+  const formatTick = v => {
+    const valore = Math.abs(v) < Math.pow(10, -decimali) / 2 ? 0 : v;
+    return valore.toFixed(decimali);
+  };
+  const ticks = [];
+  for(let v = Math.ceil(lo/passo)*passo; v <= hi + 1e-9; v += passo) ticks.push(v);
+
+  let g = '';
+  ticks.forEach(v => {
+    g += '<line x1="'+mL+'" y1="'+py(v).toFixed(1)+'" x2="'+(W-mR)+'" y2="'+py(v).toFixed(1)+
+         '" stroke="var(--hair-soft)" stroke-width="1"/>';
+    g += '<text x="'+(mL-7)+'" y="'+(py(v)+3.5).toFixed(1)+'" text-anchor="end" fill="var(--muted)"'+
+         ' font-size="10" font-family="IBM Plex Mono, monospace">'+formatTick(v)+'</text>';
+  });
+  for(let i=0;i<T;i+=5){
+    g += '<text x="'+px(i).toFixed(1)+'" y="'+(H-mB+16)+'" text-anchor="middle" fill="var(--muted)"'+
+         ' font-size="10" font-family="IBM Plex Mono, monospace">'+nomi[i]+'</text>';
+  }
+  (opt.rif||[]).forEach(rf => {
+    g += '<line x1="'+mL+'" y1="'+py(rf.v).toFixed(1)+'" x2="'+(W-mR)+'" y2="'+py(rf.v).toFixed(1)+
+         '" stroke="'+(rf.colore||'var(--muted)')+'" stroke-width="1.5" stroke-dasharray="5 4"/>';
+  });
+
+  opt.serie.forEach(s => {
+    let d = '', aperto = false, ultimo = -1;
+    s.v.forEach((v,i) => {
+      if(v === null || !isFinite(v)){ aperto = false; return; }
+      d += (aperto ? 'L' : 'M') + px(i).toFixed(1) + ' ' + py(v).toFixed(1) + ' ';
+      aperto = true; ultimo = i;
+    });
+    if(d) g += '<path d="'+d+'" fill="none" stroke="'+s.colore+'" stroke-width="2"'+
+               ' stroke-linejoin="round" stroke-linecap="round"'+
+               (s.trat ? ' stroke-dasharray="5 4"' : '')+'/>';
+    if(ultimo >= 0 && s.punta !== false){
+      g += '<circle cx="'+px(ultimo).toFixed(1)+'" cy="'+py(s.v[ultimo]).toFixed(1)+'" r="3.4"'+
+           ' fill="'+s.colore+'" stroke="var(--surface)" stroke-width="2"/>';
+    }
+  });
+
+  g += '<line x1="'+mL+'" y1="'+(H-mB)+'" x2="'+(W-mR)+'" y2="'+(H-mB)+'" stroke="var(--hair)" stroke-width="1"/>';
+  g += '<rect class="cattura" x="'+mL+'" y="'+mT+'" width="'+(W-mL-mR)+'" height="'+(H-mT-mB)+'" fill="transparent"/>';
+
+  host.innerHTML = '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+(opt.titolo||'')+'">'+g+'</svg>';
+
+  const svg = host.querySelector('svg');
+  const tip = host.parentElement.querySelector('.tip');
+  const rect = svg.querySelector('.cattura');
+  if(!rect || !tip) return;
+  rect.addEventListener('mousemove', ev => {
+    const b = svg.getBoundingClientRect();
+    const xr = (ev.clientX - b.left) / b.width * W;
+    let i = Math.round((xr - mL) / ((W - mL - mR) / (T - 1)));
+    i = Math.max(0, Math.min(T-1, i));
+    const righe = opt.serie.filter(s => s.v[i] !== null && isFinite(s.v[i]))
+                           .map(s => s.nome + ' ' + s.v[i].toFixed(2) + '%');
+    if(!righe.length){ tip.style.opacity = 0; return; }
+    tip.innerHTML = '<b>Period ' + (i+1) + '</b><br>' + righe.join('<br>');
+    tip.style.left = (px(i) / W * b.width) + 'px';
+    tip.style.top  = (svg.offsetTop + py(opt.serie.find(s=>s.v[i]!==null).v[i]) / H * b.height) + 'px';
+    tip.style.opacity = 1;
+  });
+  rect.addEventListener('mouseleave', () => tip.style.opacity = 0);
+}
+
+/* ===================== schermata di gioco ===================== */
+function mostraPeriodo(){
+  const prec = t - 1;
+  $('#etichettaPeriodo').textContent = 'Period ' + (t + 1);
+  $('#etichettaP2').textContent = 'period ' + (t + 1);
+  $('#sottoPeriodo').textContent = 'of ' + T;
+
+  $('#txtDomanda').textContent = testoDomanda(t);
+  $('#txtCosti').textContent = testoCosti(t);
+
+  const vi = $('#vInfl');
+  vi.textContent = pct(infl[prec]);
+  vi.className = 'v' + (Math.abs(infl[prec] - TGT) > 0.5 ? ' alta' : '');
+  const vg = $('#vGap');
+  vg.textContent = num(gap[prec]);
+  vg.className = 'v' + (gap[prec] < -1 ? ' neg' : '');
+  $('#vTasso').textContent = pct(r[prec]);
+
+  $('#tasso').value = r[prec].toFixed(2);
+  $('#slider').value = Math.max(-8, Math.min(16, r[prec]));
+
+  $('#boxSugg').hidden = true;
+  $('#btnSugg').disabled = false;
+
+  $('#avanzTesto').textContent = 'period ' + t + ' of ' + (T - 1);
+  $('#avanzBarra').style.width = ((t - 1) / (T - 1) * 100) + '%';
+
+  grafici();
+}
+
+function grafici(){
+  disegna('gGap',  {titolo:'Output gap', serie:[{nome:'output gap (index points)', v:gap, colore:'var(--tu)'}], rif:[{v:0}]});
+  disegna('gInfl', {titolo:'Inflation', serie:[{nome:'inflation', v:infl, colore:'var(--tu)'}], rif:[{v:TGT}]});
+  disegna('gTassi',{titolo:'Interest rate', serie:[{nome:'interest rate', v:r, colore:'var(--tu)'}], rif:[{v:RBAR}]});
+}
+
+
+/* ===================== estimated reaction rule ===================== */
+function estimateReactionRule(rates, prices, gaps, last){
+  const n = last;
+  if(n < 4) return {n, reason:'short'};
+  const xs = [], zs = [], ys = [];
+  for(let i = 1; i <= last; i++){
+    xs.push(prices[i-1] - TGT);
+    zs.push(gaps[i-1]);
+    ys.push(rates[i]);
+  }
+  const mean = v => v.reduce((a,b) => a+b, 0) / n;
+  const mx = mean(xs), mz = mean(zs), my = mean(ys);
+  let xx=0, zz=0, xz=0, xy=0, zy=0, yy=0;
+  for(let i=0; i<n; i++){
+    const x=xs[i]-mx, z=zs[i]-mz, y=ys[i]-my;
+    xx+=x*x; zz+=z*z; xz+=x*z; xy+=x*y; zy+=z*y; yy+=y*y;
+  }
+  if(xx < 1e-12 || zz < 1e-12) return {n, reason:'variation'};
+  // Standardise the predictors to check whether their separate responses are identifiable.
+  const sx=Math.sqrt(xx), sz=Math.sqrt(zz), rho=xz/(sx*sz);
+  const determinant=1-rho*rho;
+  if(determinant < 1e-8) return {n, reason:'collinear'};
+  const b=(xy/sx-rho*zy/sz)/(determinant*sx);
+  const c=(zy/sz-rho*xy/sx)/(determinant*sz);
+  const a=my-b*mx-c*mz;
+  let sse=0;
+  for(let i=0;i<n;i++) sse+=(ys[i]-a-b*xs[i]-c*zs[i])**2;
+  return {n,a,b,c,r2:yy<1e-12?null:Math.max(0,Math.min(1,1-sse/yy)), reason:null};
+}
+
+function showReactionRule(){
+  $('#reactionPanel').hidden = tf < 1;
+  $('#ruleResults').hidden = true;
+  $('#ruleA').textContent = 'a';
+  $('#ruleB').textContent = '+ b';
+  $('#ruleC').textContent = '+ c';
+  if(tf < 1) return;
+  const fit = estimateReactionRule(r,infl,gap,tf);
+  if(fit.reason){
+    const messages = {
+      short:'At least four completed decisions are needed to estimate this rule. You completed '+fit.n+'.',
+      variation:'There is too little variation in observed inflation or the output gap to estimate their separate responses. No numerical coefficients are reported.',
+      collinear:'Observed inflation and the output gap move too closely together to estimate their separate responses reliably. No numerical coefficients are reported.'
+    };
+    $('#ruleStatus').textContent = messages[fit.reason];
+    return;
+  }
+  const rounded = v => (Math.abs(v)<0.0005?0:v).toFixed(3);
+  const signed = v => (v < -0.0005 ? '\u2212 ' : '+ ') + rounded(Math.abs(v));
+  $('#ruleA').textContent = rounded(fit.a);
+  $('#ruleB').textContent = signed(fit.b);
+  $('#ruleC').textContent = signed(fit.c);
+  $('#ruleIntercept').textContent = rounded(fit.a)+'%';
+  $('#ruleInflation').textContent = rounded(fit.b);
+  $('#ruleGap').textContent = rounded(fit.c);
+  $('#ruleStatus').textContent = 'Estimated from '+fit.n+' interest-rate decisions.';
+  function response(value, predictor, other){
+    if(Math.abs(value)<0.0005) return '<p>A '+predictor+' is associated with almost no change in your real interest rate, holding '+other+' constant (the estimated response rounds to zero).</p>';
+    return '<p>A '+predictor+' is associated with a '+rounded(Math.abs(value))+' percentage-point '+(value>0?'higher':'lower')+' real interest rate, holding '+other+' constant.</p>';
+  }
+  $('#ruleFeedback').innerHTML = response(fit.b,'1 percentage-point increase in observed inflation','the output gap')+
+    response(fit.c,'1 index-point increase in the observed output gap','inflation');
+  $('#ruleFit').textContent = fit.r2 === null
+    ? 'Your interest rate did not vary, so R\u00b2 is not defined.'
+    : 'R\u00b2 = '+fit.r2.toFixed(3)+'. The fitted rule accounts for '+(100*fit.r2).toFixed(1)+'% of the variation in your chosen interest rate within this term.';
+  $('#ruleResults').hidden = false;
+}
+
+/* ===================== finale ===================== */
+function termina(){
+  $('#schermoIntro').hidden = true;
+  $('#schermoGioco').hidden = true;
+  $('#schermoFine').hidden = false;
+
+  showReactionRule();
+  const n = tf + 1;
+  if(tf < 1){
+    $('#titoloEsito').textContent = 'Your term ended without any decisions.';
+    $('#sottoEsito').textContent = "No interest rate was set: there is nothing to assess.";
+    document.querySelectorAll('#schermoFine .score .v').forEach(e => e.textContent = '\u2014');
+    
+    document.querySelector('#schermoFine .grafici').hidden = true;
+    document.querySelector('#schermoFine .tabella').hidden = true;
+    return;
+  }
+  document.querySelector('#schermoFine .grafici').hidden = false;
+  document.querySelector('#schermoFine .tabella').hidden = false;
+
+  const mia = infl.slice(0, n);
+  const L = mia.reduce((a,v) => a + Math.abs(v - TGT), 0) / n;
+  const gapMax = gap.slice(0, n).reduce((a,v) => Math.abs(v) > Math.abs(a) ? v : a, 0);
+
+  let titolo;
+  if(L < 0.05)      titolo = "Almost perfect stabilisation.";
+  else if(L < 0.25) titolo = "Good stewardship: inflation stayed close to target.";
+  else if(L < 1)    titolo = "Inflation slipped out of your control for a while.";
+  else              titolo = "A difficult term: inflation moved far from target.";
+  $('#titoloEsito').textContent = titolo;
+  $('#sottoEsito').textContent = tf < T - 1
+    ? "Your term ended early: you governed for " + tf + " periods out of " + (T-1) +
+      ". The comparison covers the same time window."
+    : "Full term completed: " + (T-1) + " periods.";
+
+  $('#sTu').textContent  = L.toFixed(3);
+  $('#sMax').textContent = pct(Math.max(...mia));
+  $('#sMin').textContent = pct(Math.min(...mia));
+  $('#sGap').textContent = num(gapMax);
+
+  $('#sAiuti').textContent = aiuti + ' / ' + tf;
+
+  const fino = a => a.map((v,i) => i <= tf ? v : null);
+  const zero = new Array(T).fill(0);
+  const duePerCento = new Array(T).fill(TGT);
+
+  disegna('fGap',  {titolo:'Output gap', serie:[
+      {nome:'stabilisation', v:zero, colore:'var(--fed)', trat:true, punta:false},
+      {nome:'you', v:fino(gap), colore:'var(--tu)'}], rif:[{v:0}]});
+  disegna('fInfl', {titolo:'Inflation', serie:[
+      {nome:'stabilisation', v:duePerCento, colore:'var(--fed)', trat:true, punta:false},
+      {nome:'you', v:fino(infl), colore:'var(--tu)'}], rif:[{v:TGT}]});
+  disegna('fTasso',{titolo:'Interest rate', serie:[
+      {nome:'stabilising', v:RSTAR, colore:'var(--fed)', trat:true, punta:false},
+      {nome:'you', v:fino(r), colore:'var(--tu)'}], rif:[{v:RBAR}]});
+
+  let h = '<thead><tr><th>period</th><th>your r (%)</th><th>stabilising r</th>' +
+          '<th>gap (index points)</th><th>inflation (%)</th></tr></thead><tbody>';
+  for(let i=0;i<T;i++){
+    const mio = i <= tf;
+    h += '<tr><td>' + (i+1) + '</td><td>' + (mio?num(r[i]):'') + '</td><td>' + num(RSTAR[i]) +
+         '</td><td>' + (mio?num(gap[i]):'') + '</td><td>' + (mio?num(infl[i]):'') + '</td></tr>';
+  }
+  $('#tabDati').innerHTML = h + '</tbody>';
+}
+
+/* ===================== eventi ===================== */
+const inp = $('#tasso'), sld = $('#slider');
+inp.addEventListener('input', () => { const v = parseFloat(inp.value); if(isFinite(v)) sld.value = Math.max(-8, Math.min(16, v)); });
+sld.addEventListener('input', () => { inp.value = parseFloat(sld.value).toFixed(2); });
+document.querySelectorAll('.nudge button').forEach(b => b.addEventListener('click', () => {
+  const d = b.dataset.d, base = r[t-1];
+  const v = griglia(d === 'invariato' ? base : (parseFloat(inp.value) || 0) + parseFloat(d));
+  inp.value = v.toFixed(2); sld.value = Math.max(-8, Math.min(16, v));
+}));
+
+$('#btnConferma').addEventListener('click', () => {
+  const grezzo = parseFloat(inp.value);
+  if(!isFinite(grezzo)){ inp.focus(); return; }
+  const v = griglia(grezzo);
+  inp.value = v.toFixed(2);
+  const prima = infl[t-1];
+  passo(v);
+  $('#eGap').textContent  = num(gap[t]);
+  $('#eY').textContent    = num(100 + y[t]);
+  $('#eInfl').textContent = pct(infl[t]);
+  $('#eD').textContent    = (infl[t] - prima >= 0 ? '+' : '') + (infl[t] - prima).toFixed(2) + ' pp';
+  $('#esito').hidden = false;
+  t++;
+  if(t >= T){ termina(); } else { mostraPeriodo(); }
+});
+inp.addEventListener('keydown', e => { if(e.key === 'Enter') $('#btnConferma').click(); });
+
+$('#btnSugg').addEventListener('click', () => {
+  const stabile = RSTAR[t];
+  const SCARTI = [-0.25, 0, 0, 0.25];
+  const scarto = () => SCARTI[Math.floor(Math.random() * 4)];
+  $('#sBassa').textContent = griglia(stabile - 0.5 + scarto()).toFixed(2) + '%';
+  $('#sAlta').textContent  = griglia(stabile + 0.5 + scarto()).toFixed(2) + '%';
+  $('#sNota').textContent  = 'Approximate estimate based on current demand and supply conditions.';
+  $('#boxSugg').hidden = false;
+  $('#btnSugg').disabled = true;
+  aiuti++;
+});
+
+$('#btnFine').addEventListener('click', () => { tf = t - 1; termina(); });
+
+function mostraSchermo(nome){
+  $('#schermoIntro').hidden = nome !== 'intro';
+  $('#schermoGioco').hidden = nome !== 'gioco';
+  if(nome !== 'gioco') $('#schermoFine').hidden = true;
+  const inPartita = nome !== 'intro';
+  $('#avanzTesto').hidden = !inPartita;
+  document.querySelector('.barra').hidden = !inPartita;
+  $('#btnGuida').hidden = !inPartita;
+  window.scrollTo(0, 0);
+}
+
+$('#btnInizia').addEventListener('click', () => mostraSchermo('gioco'));
+$('#btnGuida').addEventListener('click', () => mostraSchermo('intro'));
+$('#btnRigioca').addEventListener('click', () => { avvia(); mostraSchermo('gioco'); });
+
+avvia();
+mostraSchermo('intro');
+</script>
+
+</html>
